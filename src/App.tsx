@@ -1,10 +1,13 @@
+import { Button } from "./components/Button"
+
 function App() {
 
   return (
     <>
-      <p>
-        HELLO WORLD
-      </p>
+      <Button variant="primary" />
+      <Button variant="secondary" />
+      <Button variant="success" />
+      <Button />
     </>
   )
 }
