@@ -1,20 +1,19 @@
-import { ThemeProvider } from "styled-components"
-import { Button } from "./components/Button"
-import { defaultTheme } from "./styles/themes/default"
-import { GlobalStyle } from "./styles/global"
+import { ThemeProvider } from 'styled-components';
+import { Button } from './components/Button';
+import { defaultTheme } from './styles/themes/default';
+import { GlobalStyle } from './styles/global';
 
-function App() {
+function App (): JSX.Element {
+    return (
+        <ThemeProvider theme={defaultTheme}>
+            <Button variant="primary" />
+            <Button variant="secondary" />
+            <Button variant="success" />
+            <Button />
 
-  return (
-    <ThemeProvider theme={defaultTheme}>
-      <Button variant="primary" />
-      <Button variant="secondary" />
-      <Button variant="success" />
-      <Button />
-
-      <GlobalStyle />
-    </ThemeProvider>
-  )
+            <GlobalStyle />
+        </ThemeProvider>
+    );
 }
 
-export default App
+export default App;
