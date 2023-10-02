@@ -16,7 +16,7 @@ import {
 
 const newCycleFormValidationSchema = zod.object({
     task: zod.string().min(1, 'Informe a tarefa'),
-    minutesAmont: zod.number().min(5).max(60)
+    minutesAmount: zod.number().min(5).max(60)
 });
 
 type NewCycleFormData = zod.infer<typeof newCycleFormValidationSchema>
@@ -24,31 +24,31 @@ type NewCycleFormData = zod.infer<typeof newCycleFormValidationSchema>
 interface Cycle {
     id: string;
     task: string;
-    minutesAmont: number;
+    minutesAmount: number;
 }
 
 export function Home() {
     const [cycles, setCycles] = useState<Cycle[]>([]);
     const [activeCycleId, setActiveCycleId] = useState<string | null>(null);
+    const [amountSecondsPassed, setAmountSecondsPassed] = useState(0);
 
     const { register, handleSubmit, watch, reset } = useForm<NewCycleFormData>({
         resolver: zodResolver(newCycleFormValidationSchema),
         defaultValues: {
             task: '',
-            minutesAmont: 0,
+            minutesAmount: 0,
         }
     });
 
     function handleCreateNewCycle(data: NewCycleFormData) {
-        const { task, minutesAmont } = data;
+        console.log(data);
+        const { task, minutesAmount } = data;
         const id = String(new Date().getTime());
-        const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId);
-        console.log(activeCycle);
         
         const newCycle: Cycle = {
             id,
             task,
-            minutesAmont,
+            minutesAmount,
         };
         setCycles((state) => [...state, newCycle]);
         setActiveCycleId(id);
@@ -56,7 +56,20 @@ export function Home() {
         reset();
     }
 
-    const isSubmitDisabled = !watch('task');
+    
+    const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId);
+    const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0;
+
+    const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0;
+
+    const minutesAmount = Math.floor(currentSeconds / 60);
+    const secondsAmount = Math.floor(currentSeconds % 60);
+
+    const minutes = String(minutesAmount).padStart(2, '0');
+    const seconds = String(secondsAmount).padStart(2, '0');
+
+    const task = watch('task');
+    const isSubmitDisabled = !task;
 
     return (
         <HomeContainer>
@@ -91,11 +104,11 @@ export function Home() {
                 </FormContainer>
 
                 <CountDownContainer>
-                    <span>0</span>
-                    <span>0</span>
+                    <span>{minutes[0]}</span>
+                    <span>{minutes[1]}</span>
                     <Separator>:</Separator>
-                    <span>0</span>
-                    <span>0</span>
+                    <span>{seconds[0]}</span>
+                    <span>{seconds[1]}</span>
                 </CountDownContainer>
 
                 <StartCountDownButton disabled={isSubmitDisabled} type='submit'>
