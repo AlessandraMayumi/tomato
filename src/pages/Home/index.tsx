@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Play } from 'phosphor-react';
+import { differenceInSeconds } from 'date-fns';
 import * as zod from 'zod';
 import {
     CountDownContainer,
@@ -25,6 +26,7 @@ interface Cycle {
     id: string;
     task: string;
     minutesAmount: number;
+    startData: Date;
 }
 
 export function Home() {
@@ -40,24 +42,8 @@ export function Home() {
         }
     });
 
-    function handleCreateNewCycle(data: NewCycleFormData) {
-        console.log(data);
-        const { task, minutesAmount } = data;
-        const id = String(new Date().getTime());
-        
-        const newCycle: Cycle = {
-            id,
-            task,
-            minutesAmount,
-        };
-        setCycles((state) => [...state, newCycle]);
-        setActiveCycleId(id);
-
-        reset();
-    }
-
-    
     const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId);
+
     const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0;
 
     const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0;
@@ -70,6 +56,31 @@ export function Home() {
 
     const task = watch('task');
     const isSubmitDisabled = !task;
+
+    useEffect(()=>{
+        if (activeCycle) {
+            setInterval(() => {
+                setAmountSecondsPassed(differenceInSeconds(new Date(), activeCycle.startData));
+            }, 1000);
+        }
+    }, [activeCycle]);
+
+    function handleCreateNewCycle(data: NewCycleFormData) {
+        console.log(data);
+        const { task, minutesAmount } = data;
+        const id = String(new Date().getTime());
+
+        const newCycle: Cycle = {
+            id,
+            task,
+            minutesAmount,
+            startData: new Date(),
+        };
+        setCycles((state) => [...state, newCycle]);
+        setActiveCycleId(id);
+
+        reset();
+    }
 
     return (
         <HomeContainer>
