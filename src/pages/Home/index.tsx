@@ -57,16 +57,29 @@ export function Home() {
     const task = watch('task');
     const isSubmitDisabled = !task;
 
-    useEffect(()=>{
+    useEffect(() => {
+        // This code runs when the component mounts
+        let interval: number;
         if (activeCycle) {
-            setInterval(() => {
+            interval = setInterval(() => {
                 setAmountSecondsPassed(differenceInSeconds(new Date(), activeCycle.startData));
             }, 1000);
         }
+
+        // Return a cleanup function
+        return () => {
+            // This code runs when the component unmounts or when dependencies change
+            clearInterval(interval);
+        };
     }, [activeCycle]);
 
+    useEffect(() => {
+        if (activeCycle) {
+            document.title = `${minutes}:${seconds}`;
+        }
+    }, [minutes, seconds, activeCycle]);
+
     function handleCreateNewCycle(data: NewCycleFormData) {
-        console.log(data);
         const { task, minutesAmount } = data;
         const id = String(new Date().getTime());
 
@@ -78,6 +91,7 @@ export function Home() {
         };
         setCycles((state) => [...state, newCycle]);
         setActiveCycleId(id);
+        setAmountSecondsPassed(0);
 
         reset();
     }
