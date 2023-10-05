@@ -19,6 +19,7 @@ interface NewCycleType {
 }
 
 interface CycleContextType {
+  cycles: Cycle[];
   activeCycle: Cycle | undefined,
   setCycleFinishedDate: () => void,
   activeCycleId: string | null,
@@ -68,8 +69,6 @@ export function CycleContextProvider({ children }: CycleContextProviderProps) {
     setCycles((state) => [...state, newCycle]);
     setActiveCycleId(id);
     setAmountSecondsPassed(0);
-
-    // reset();
   }
 
   function interruptCycle() {
@@ -82,6 +81,7 @@ export function CycleContextProvider({ children }: CycleContextProviderProps) {
 
   return (
     <CycleContext.Provider value={{
+      cycles,
       activeCycle,
       setCycleFinishedDate,
       activeCycleId,
