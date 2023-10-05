@@ -1,10 +1,10 @@
 import { useContext, useEffect } from 'react';
 import { differenceInSeconds } from 'date-fns';
+import { CycleContext } from '../../../context/CycleContext';
 import {
   CountDownContainer,
   Separator,
 } from './styles';
-import { CycleContext } from '..';
 
 
 export function Countdown() {
