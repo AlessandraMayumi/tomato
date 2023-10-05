@@ -24,12 +24,12 @@ const newCycleFormValidationSchema = zod.object({
 type NewCycleFormData = zod.infer<typeof newCycleFormValidationSchema>
 
 interface Cycle {
-    id: string;
-    task: string;
-    minutesAmount: number;
-    startDate: Date;
-    interruptedDate?: Date;
-    finishedDate?: Date;
+  id: string;
+  task: string;
+  minutesAmount: number;
+  startDate: Date;
+  interruptedDate?: Date;
+  finishedDate?: Date;
 }
 
 export function Home() {
@@ -64,7 +64,20 @@ export function Home() {
     let interval: number;
     if (activeCycle) {
       interval = setInterval(() => {
-        setAmountSecondsPassed(differenceInSeconds(new Date(), activeCycle.startDate));
+        const currentDate = new Date();
+        const currentSeconds = differenceInSeconds(currentDate, activeCycle.startDate);
+
+        if (currentSeconds < totalSeconds) setAmountSecondsPassed(currentSeconds);
+        else {
+          setCycles(state =>
+            state.map(cycle => {
+              if (cycle.id === activeCycleId) return { ...cycle, finishedDate: currentDate };
+              else return cycle;
+            })
+          );
+          clearInterval(interval);
+          setAmountSecondsPassed(0);
+        }
       }, 1000);
     }
     // Return a cleanup function
@@ -99,7 +112,7 @@ export function Home() {
 
   function handleInterruptCycle() {
     setActiveCycleId(null);
-    setCycles(cycles.map(cycle => {
+    setCycles(state => state.map(cycle => {
       if (cycle.id === activeCycleId) return { ...cycle, interruptedDate: new Date() };
       else return cycle;
     }));
@@ -150,12 +163,12 @@ export function Home() {
         {activeCycle ? (
           <StoptCountDownButton onClick={handleInterruptCycle} type='button'>
             <HandPalm size={24} />
-                        Interromper
+            Interromper
           </StoptCountDownButton>
         ) : (
           <StartCountDownButton disabled={isSubmitDisabled} type='submit'>
             <Play size={24} />
-                        Começar
+            Começar
           </StartCountDownButton>
         )}
       </form>
