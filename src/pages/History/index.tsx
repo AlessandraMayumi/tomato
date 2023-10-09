@@ -15,11 +15,11 @@ export function History() {
         <td>{formatDistanceToNow(cycle.startDate, { addSuffix: true, locale: ptBR })}</td>
         <td>
           {cycle.finishedDate &&
-            <Status statusColor="green">Concluído</Status>}
+            <Status statuscolor="green">Concluído</Status>}
           {!cycle.finishedDate && !cycle.interruptedDate &&
-            <Status statusColor="yellow">Em Andamento</Status>}
+            <Status statuscolor="yellow">Em Andamento</Status>}
           {!cycle.finishedDate && cycle.interruptedDate &&
-            <Status statusColor="red">Interrompido</Status>}
+            <Status statuscolor="red">Interrompido</Status>}
         </td>
       </tr>
     );
