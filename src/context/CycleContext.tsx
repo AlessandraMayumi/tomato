@@ -1,4 +1,4 @@
-import { ReactNode, createContext, useReducer, useState } from 'react';
+import { ReactNode, createContext, useEffect, useReducer, useState } from 'react';
 import { ActionTypes } from '../reducers/cycles/actions';
 import { cycleReducer } from '../reducers/cycles/reducer';
 
@@ -31,23 +31,42 @@ interface CycleContextType {
   interruptCycle: () => void,
 }
 
+interface CyclesState {
+  cycles: Cycle[];
+  activeCycleId: string | null;
+}
+
 /** Context */
 export const CycleContext = createContext({} as CycleContextType);
 
 /** Context Provider */
 export function CycleContextProvider({ children }: CycleContextProviderProps) {
   // Reducer
-  const [cyclesState, dispatch] = useReducer(cycleReducer, {
-    cycles: [],
-    activeCycleId: null,
-  });
+  const [cyclesState, dispatch] = useReducer(
+    cycleReducer,
+    { cycles: [], activeCycleId: null },
+    (initArgs) => {
+      const storagedStateAsJSON = localStorage.getItem('@tomato:cycles-state');
+      if (storagedStateAsJSON) {
+        const parsedState = JSON.parse(storagedStateAsJSON) as CyclesState;
+        return parsedState;
+      }
+      return initArgs;
+    }
+  );
   // State
   const [amountSecondsPassed, setAmountSecondsPassed] = useState(0);
   // Local
   const { cycles, activeCycleId } = cyclesState;
   const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId);
 
-  // Context function
+  useEffect(() => {
+    // updates cycleState in localStorage
+    const stateJSON = JSON.stringify(cyclesState);
+    localStorage.setItem('@tomato:cycles-state', stateJSON);
+  }, [cyclesState]);
+
+  /* Context function */
   function setCycleFinishedDate() {
     dispatch({
       type: ActionTypes.FINISHED_DATE,
@@ -59,7 +78,7 @@ export function CycleContextProvider({ children }: CycleContextProviderProps) {
     setAmountSecondsPassed(sec);
   }
 
-  // Handle functions
+  /* Handle functions */ 
   function createNewCycle(data: NewCycleType) {
     const { task, minutesAmount } = data;
     const id = String(new Date().getTime());
